@@ -10,3 +10,9 @@ class Settings:
 
         # Настройка скорости перемещения корабля
         self.ship_speed = 3.2
+
+        self.bullet_speed = 4
+        self.bullet_width = 3
+        self.bullet_height = 15
+        self.bullet_color = (255, 0, 255)
+        self.bullet_allowed = 3

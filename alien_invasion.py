@@ -1,7 +1,9 @@
+import pygame
 import sys
 from settings import Settings
 from ship import Ship
-import pygame
+from bullet import Bullet
+
 
 class AlienInvasion:
     """Класс управления ресурсами и поведением приложения"""
@@ -22,6 +24,7 @@ class AlienInvasion:
         self.bg_image = pygame.image.load(self.settings.bg_image)
         self.ship = Ship(self)
         
+        self.bullets = pygame.sprite.Group()
 
     def _check_events(self):
         """Обработка событий нажатия на клавиш и мыши"""
@@ -52,6 +55,8 @@ class AlienInvasion:
             self.ship.moving_left = True
         elif event.key == pygame.K_q:
             sys.exit()
+        elif event.key == pygame.K_SPACE:
+            self._fire_bullet()
         elif event.key == pygame.K_F5:
             # Развернуть на полный экран
             self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
@@ -69,14 +74,28 @@ class AlienInvasion:
             self.ship.moving_left = False
 
             
+    def _fire_bullet(self):
+        """Создание нового снаряда и включение его в группу bullets"""
+        if len(self.bullets) < self.settings.bullet_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
 
 
+    def _update_bullets(self):
+        """Обновляет положение снарядов и удаляет старые снаряды"""
+        # Удаление снарядов, вышедших за пределы экрана
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+        # print(len(self.bullets))
 
     def _update_screen(self):
         """Отображение изображения на экране"""
         # self.screen.fill(self.bg_color)
         self.screen.blit(self.bg_image, (0, 0))
         self.ship.blitme()
+        for bullet in self.bullets.sprites():
+            bullet.draw_bullet()
         pygame.display.flip()
 
 
@@ -86,8 +105,9 @@ class AlienInvasion:
         while True:
             self._check_events()
             self.ship.update()
+            self.bullets.update()
+            self._update_bullets()
             self._update_screen()
-            
 
 if __name__=='__main__':
     ai = AlienInvasion()
